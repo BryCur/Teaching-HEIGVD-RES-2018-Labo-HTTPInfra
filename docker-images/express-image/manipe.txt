@@ -1,0 +1,10 @@
+docker build -t res/express_adresses . //Créer l'image
+docker run res/express_adresses	       //Lancer le container
+
+docker-machine ssh // on va dans la boite grise ( ou il y a les container) car on a pas encore accès a nos containers
+//On peut récupérer l'adresse du container avec docker inspect <nom-container>
+//maintenant si on fait un telnet <IP container> 3000 le lance
+//on supprime le container et on le map sur 9090:3000
+
+docker run -p 9091:3000 res/express_adresses
+telnet 192.168.99.100 9091
