@@ -1,4 +1,8 @@
-# Etape 1
+# RES-Labo05 : Infrastructure HTTP
+
+Auteurs : Burgener François, Curchod Bryan
+
+##  Etape 1 - Serveur HTTP statique (php)
 
 ```
 docker build -t res/apache_php
@@ -8,9 +12,9 @@ docker build -t res/apache_php
 docker run -d -p 9090:80 res/apache_php
 ```
 
-dans le navigateur **192.168.99.100:9090**
+dans le navigateur nous pouvons désormais accéder à l'adresse **192.168.99.100:9090** pour admirer notre site et template bootstrap.
 
-# Etape 2
+## Etape 2 - Serveur HTTP dynamique (js)
 
 Dans le dossier express-image
 
@@ -19,42 +23,34 @@ docker build -t res/express_adresses .
 ```
 
 ```
-docker run res/express_adresses
-```
-
-sur le navigateur : **localhost:3000** pour voir que la génération aléatoire d'adresse s'effectue bien
-
-Si on veut le faire via le containter il suffie de mapper les port
-
-```
 docker run -p 9090:3000 res/express_adresses
 ```
 
-sur le navigateur : **192.168.99.199:9090** pour voir que la génération aléatoire d'adresse s'effectue bien
+sur le navigateur : **192.168.99.199:9090** pour accéder à l'application javasrcipt et voir que nous générons effectivement des "adresses" aléatoires.
 
-# Etape 3
-
-Dans le dossier apache-reverse-proxy
+## Etape 3 - Reverse proxy (statique)
 
 ```
+docker build -t res/apache_php .
+docker build -t res/express_adresses .
 docker build -t res/apache_rp .
 ```
 
 ```
-docker run -p 8080:80 res/apache_rp
+docker run --name apache_static -d res/apache_php
+docker run --name express_dynamic -d res/express_adresses
+docker run -p 8080:80 --name apache_rp -d res/apache_rp
 ```
 
-dans le fichier host ajouter la ligne suivante (chemin du fichier host**C:\Windows\System32\drivers\etc**)
+dans le fichier host ajouter la ligne suivante (chemin du fichier host **C:\Windows\System32\drivers\etc**)
 
 ```
 192.168.99.100 demo.res.ch
 ```
 
-Dans le navigateur on peut maintenant faire **http://demo.res.ch:8080** ou **http://demo.res.ch:8080/api/addresses/**
+Dans le navigateur on peut maintenant utiliser les adresses **http://demo.res.ch:8080** pour accéder au serveur apache (avec le site bootstrap) et **http://demo.res.ch:8080/api/addresses/** pour l'application javascript générant des adresses aléatoires.
 
-
-
-# Etape 4
+## Etape 4 - Requête AJAX (JQuery)
 
 Dans le dossier apache_php_image
 
@@ -74,7 +70,7 @@ Dans le dossier apache-reverse-proxy
 docker build -t res/apache_rp .
 ```
 
-Si il y a des problème avec les dépendance faire un npm install
+S'il y a des problème avec les dépendance faire un `npm install --save`
 
 Il faut run les containers dans cette ordre
 
@@ -89,4 +85,6 @@ docker run -d -name express_dynamic res/express_adresses
 ```
 docker run -d -name apache_rp -p 8080:80 res/apache_rp
 ```
+
+## Etape 5 - Reverse proxy (dynamique) 
 
