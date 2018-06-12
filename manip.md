@@ -88,3 +88,31 @@ docker run -d -name apache_rp -p 8080:80 res/apache_rp
 
 ## Etape 5 - Reverse proxy (dynamique) 
 
+``` bash
+docker build -t res/apache_php .
+docker build -t res/express_adresses .
+docker build -t res/apache_rp .
+```
+
+NB : nous construisons une première fois nos images pour les initialiser
+
+lancement des containers : 
+
+```dockerfile
+docker run -d --name apache_static res/apache_php
+docker run -d --name epress_adresses res/express_adresses
+```
+
+Nous pourrions lancer plusieurs fois ces containers afin d'avoir l'embaras du choix des serveurs à utiliser. Une fois les containers lancés, il faut récupérer les adresses IP de ces derniers à l'aide de la commande 
+
+```dockerfile
+docker inspect CONTAINER_APACHE_STATIQUE | grep -i ipaddr
+docker inspect CONTAINER_EXPRESS_DYNAMIQUE | grep -i ipaddr
+```
+
+une fois ces adresses récupérées lancer le serveur reverse-proxy en lui fournissant lesdites adresses pour définir les variables environementales (instruction `-e VAR=VAL`).
+
+````dockerfile
+docker run -d -e STATIC_APP=IP_APACHE_STATIQUE:80 -e DYNAMIC_APP=IP_EXPRESS_DYNAMIQUE:3000 -p 8080:80 --name apache_rp res/apache_rp
+````
+
